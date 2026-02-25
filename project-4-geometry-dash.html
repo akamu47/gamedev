@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 4: Neon Dash</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --neon-blue: #00d4ff;
+    --neon-pink: #ff2d95;
+    --neon-yellow: #ffe600;
+    --neon-green: #00ff88;
+    --dark: #0a0014;
+    --darker: #060010;
+    --card: #110a24;
+    --glow-blue: rgba(0,212,255,0.3);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--darker);
+    color: #e0e0e0;
+    line-height: 1.7;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #0a0014 0%, #1a0a3e 40%, #0d0028 100%);
+    padding: 60px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 3px solid var(--neon-blue);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, transparent 49.5%, rgba(0,212,255,0.03) 49.5%, rgba(0,212,255,0.03) 50.5%, transparent 50.5%),
+      linear-gradient(0deg, transparent 49.5%, rgba(0,212,255,0.03) 49.5%, rgba(0,212,255,0.03) 50.5%, transparent 50.5%);
+    background-size: 60px 60px;
+    animation: gridScroll 3s linear infinite;
+  }
+
+  @keyframes gridScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-60px); }
+  }
+
+  .hero h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: var(--neon-blue);
+    text-shadow: 0 0 30px rgba(0,212,255,0.6), 0 0 60px rgba(0,212,255,0.3);
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .hero .subtitle {
+    font-size: 1.1rem;
+    color: #aaa;
+    margin-top: 10px;
+    position: relative;
+  }
+
+  .hero .badge {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+    color: white;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-top: 15px;
+    position: relative;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px;
+  }
+
+  .intro-box {
+    background: linear-gradient(135deg, var(--card), #1a0e3a);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 40px;
+  }
+
+  .intro-box h2 {
+    color: var(--neon-blue);
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .intro-box p {
+    color: #bbb;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  /* Game preview mockup */
+  .game-preview {
+    background: #0a0a1a;
+    border: 2px solid rgba(0,212,255,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 25px 0;
+    position: relative;
+    overflow: hidden;
+    height: 160px;
+  }
+
+  .ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(0deg, var(--neon-blue), rgba(0,212,255,0.1));
+    border-top: 2px solid var(--neon-blue);
+  }
+
+  .player-cube {
+    position: absolute;
+    bottom: 42px;
+    left: 80px;
+    width: 30px;
+    height: 30px;
+    background: var(--neon-green);
+    border: 2px solid #fff;
+    box-shadow: 0 0 15px rgba(0,255,136,0.5);
+    animation: bounce 0.6s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-40px) rotate(45deg); }
+  }
+
+  .obstacle {
+    position: absolute;
+    bottom: 40px;
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 30px solid var(--neon-pink);
+    filter: drop-shadow(0 0 8px rgba(255,45,149,0.5));
+  }
+
+  .obstacle:nth-child(3) { left: 200px; }
+  .obstacle:nth-child(4) { left: 280px; }
+  .obstacle:nth-child(5) { left: 350px; }
+  .obstacle:nth-child(6) { left: 500px; }
+  .obstacle:nth-child(7) { left: 530px; }
+
+  .platform-block {
+    position: absolute;
+    bottom: 70px;
+    width: 80px;
+    height: 20px;
+    background: var(--neon-yellow);
+    border: 1px solid #fff;
+    box-shadow: 0 0 10px rgba(255,230,0,0.3);
+  }
+
+  .platform-block:nth-child(8) { left: 420px; }
+
+  .preview-label {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 0.7rem;
+    color: #555;
+    font-family: 'Press Start 2P', cursive;
+  }
+
+  .phase {
+    margin-bottom: 40px;
+    border-left: 3px solid var(--neon-blue);
+    padding-left: 25px;
+    position: relative;
+  }
+
+  .phase::before {
+    content: attr(data-step);
+    position: absolute;
+    left: -18px;
+    top: 0;
+    width: 34px;
+    height: 34px;
+    background: var(--neon-blue);
+    color: var(--darker);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.9rem;
+  }
+
+  .phase h3 {
+    font-size: 1.25rem;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .phase .time {
+    font-size: 0.8rem;
+    color: var(--neon-blue);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .phase p {
+    margin-bottom: 12px;
+    color: #ccc;
+  }
+
+  .claude-prompt {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 15px 0;
+    position: relative;
+  }
+
+  .claude-prompt::before {
+    content: '🤖 Ask Claude';
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--neon-blue);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .claude-prompt code {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #e6db74;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .tip {
+    background: rgba(0,255,136,0.06);
+    border: 1px solid rgba(0,255,136,0.3);
+    border-radius: 10px;
+    padding: 15px 18px;
+    margin: 15px 0;
+    font-size: 0.9rem;
+  }
+
+  .tip::before {
+    content: '💡 Pro Tip';
+    display: block;
+    font-weight: 700;
+    color: var(--neon-green);
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+  }
+
+  .warning {
+    background: rgba(255,230,0,0.06);
+    border: 1px solid rgba(255,230,0,0.3);
+    border-radius: 10px;
+    padding: 15px 18px;
+    margin: 15px 0;
+    font-size: 0.9rem;
+  }
+
+  .warning::before {
+    content: '⚠️ Design Challenge';
+    display: block;
+    font-weight: 700;
+    color: var(--neon-yellow);
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+  }
+
+  .checklist {
+    list-style: none;
+    margin: 15px 0;
+  }
+
+  .checklist li {
+    padding: 8px 0 8px 30px;
+    position: relative;
+    color: #ccc;
+    cursor: pointer;
+  }
+
+  .checklist li::before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    font-size: 1.1rem;
+  }
+
+  .checklist li.done::before {
+    content: '☑';
+    color: var(--neon-blue);
+  }
+
+  .milestone {
+    background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(255,45,149,0.08));
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .milestone h4 {
+    color: var(--neon-blue);
+    font-size: 1rem;
+    margin-bottom: 5px;
+  }
+
+  .milestone p {
+    color: #ccc;
+    font-size: 0.9rem;
+  }
+
+  .obstacle-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .obs-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+  }
+
+  .obs-card .emoji { font-size: 2rem; margin-bottom: 6px; }
+  .obs-card h5 { color: #fff; font-size: 0.8rem; margin-bottom: 4px; }
+  .obs-card p { color: #888; font-size: 0.7rem; }
+
+  .share-section {
+    background: linear-gradient(135deg, #0a0014, #1a0a3e);
+    border: 2px solid var(--neon-blue);
+    border-radius: 16px;
+    padding: 30px;
+    margin: 30px 0;
+    text-align: center;
+  }
+
+  .share-section h3 {
+    color: var(--neon-blue);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px;
+    color: #555;
+    font-size: 0.8rem;
+    border-top: 1px solid #222;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🔷 NEON DASH</h1>
+  <div class="subtitle">Project 4 — Ed & John's Game Dev Journey</div>
+  <div class="badge">🟠 INTERMEDIATE+</div>
+</div>
+
+<div class="container">
+
+  <div class="intro-box">
+    <h2>What You're Building</h2>
+    <p>A Geometry Dash-style rhythm platformer with a twist — <strong>you build the level editor too</strong>. Your character auto-runs, you tap to jump over spikes and obstacles, and everything pulses to the beat of the music. But the real magic is that you (and your friends) can <strong>create custom levels</strong>, share them, and challenge each other to beat them.</p>
+
+    <div class="game-preview">
+      <div class="preview-label">PREVIEW</div>
+      <div class="player-cube"></div>
+      <div class="obstacle"></div>
+      <div class="obstacle"></div>
+      <div class="obstacle"></div>
+      <div class="obstacle"></div>
+      <div class="obstacle"></div>
+      <div class="platform-block"></div>
+      <div class="ground"></div>
+    </div>
+
+    <p>This project combines everything you've learned so far — Canvas graphics from Project 3, game logic from Project 1, and the idea of building for your friends from every project. You'll also learn about <strong>level data</strong> (how games store level designs), <strong>physics</strong> (gravity and jumping), and <strong>timing/rhythm</strong> in games.</p>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase" data-step="1">
+    <h3>Build the Core Runner</h3>
+    <div class="time">⏱ About 1–2 hours</div>
+
+    <p>Start with the most basic version: a cube that auto-scrolls across the screen, and you tap or press space to jump. Get this feeling good before adding anything else — if the jump doesn't feel satisfying, nothing else matters.</p>
+
+    <div class="claude-prompt">
+      <code>I want to build a Geometry Dash-style game in a single HTML file using Canvas. Let's start with just the core mechanics:
+
+1. A square player character on the left side of the screen
+2. The ground scrolls from right to left (so it looks like the player is running)
+3. Press SPACE or TAP the screen to jump
+4. Gravity pulls the player back down
+5. The jump should feel snappy and satisfying — quick rise, slightly slower fall (like Geometry Dash, not floaty)
+6. Neon visual style: dark background, glowing cyan ground line, green glowing player cube
+7. The cube should rotate while in the air (like in Geometry Dash)
+8. Add a subtle trail effect behind the player
+
+Make it work on both desktop (spacebar) and mobile (tap). Use requestAnimationFrame for smooth 60fps animation.</code>
+    </div>
+
+    <div class="tip">
+      The jump feel is EVERYTHING in this type of game. If it feels wrong, tell Claude exactly what's off: "The jump is too floaty", "I want it to feel snappier", "The gravity feels too strong". In Geometry Dash, the jump is fast up and fast down with very little hang time — that's what makes it feel precise.
+    </div>
+
+    <ul class="checklist">
+      <li>Get the auto-scrolling ground working</li>
+      <li>Add jump with spacebar and tap</li>
+      <li>Tune the gravity and jump force until it feels RIGHT</li>
+      <li>Add the cube rotation during jumps</li>
+      <li>Add the neon glow visual style</li>
+      <li>Test on both desktop and phone</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: The Jump Feels Perfect</h4>
+      <p>You have a running, jumping cube that feels amazing to control. This is your game's foundation!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase" data-step="2">
+    <h3>Add Obstacles & Level Design</h3>
+    <div class="time">⏱ About 2 hours</div>
+
+    <p>Now add the things your player needs to dodge! In Geometry Dash, levels are built from a set of obstacle types. Start with the basics and build up.</p>
+
+    <div class="obstacle-types">
+      <div class="obs-card">
+        <div class="emoji">🔺</div>
+        <h5>Spikes</h5>
+        <p>Touch = instant death. The classic.</p>
+      </div>
+      <div class="obs-card">
+        <div class="emoji">🟦</div>
+        <h5>Blocks</h5>
+        <p>Solid platforms to jump on or over</p>
+      </div>
+      <div class="obs-card">
+        <div class="emoji">🟡</div>
+        <h5>Jump Pads</h5>
+        <p>Hit one to bounce extra high</p>
+      </div>
+      <div class="obs-card">
+        <div class="emoji">💜</div>
+        <h5>Portals</h5>
+        <p>Change gravity or game speed</p>
+      </div>
+    </div>
+
+    <div class="claude-prompt">
+      <code>Now I want to add obstacles to my Neon Dash game. Here's what I need:
+
+1. SPIKES — triangles on the ground that kill the player on contact. Neon pink colour with glow.
+2. BLOCKS — solid square platforms the player can land on or needs to jump over. Neon yellow.
+3. JUMP PADS — when the player hits one, they bounce extra high automatically. Neon blue with an up-arrow.
+4. GRAVITY PORTALS — when the player passes through one, gravity flips (player runs on the ceiling until hitting another portal). Neon purple.
+
+I need a way to define levels as data. Something like an array where each element describes what obstacle is at that position. For example:
+level = [
+  { type: "spike", x: 400 },
+  { type: "block", x: 600, height: 2 },
+  { type: "jumppad", x: 800 },
+  { type: "spike", x: 900 },
+  { type: "portal", x: 1200, effect: "gravity-flip" }
+]
+
+Also add:
+- A death animation (cube shatters into particles) when hitting a spike
+- A respawn system — press space or tap to restart from the beginning
+- An attempt counter showing how many times you've tried
+- A progress bar at the top showing how far through the level you are</code>
+    </div>
+
+    <p>Now design your first level! Sketch it on paper first — think about rhythm. In Geometry Dash, obstacles come in patterns that match the music. Even without music yet, try to create a rhythm: jump, jump, wait, triple-jump, pause…</p>
+
+    <div class="claude-prompt">
+      <code>Here's the level I designed. Can you turn it into level data for my game?
+
+Section 1 (easy intro): 3 single spikes spaced far apart to get the rhythm going
+Section 2 (platforms): 2 blocks to jump on, with spikes between them
+Section 3 (jump pads): A jump pad that launches you over a tall wall of blocks
+Section 4 (tricky): Rapid spike-spike-block-spike pattern (tight timing!)
+Section 5 (gravity flip): A portal flips gravity, then you run on the ceiling dodging hanging spikes, another portal flips you back
+Section 6 (finale): Fast combination of everything, ending with a finish line
+
+Make the level about 60 seconds long at the current scroll speed.</code>
+    </div>
+
+    <div class="warning">
+      The hardest part of level design is difficulty balancing. Your first level should be hard enough to be fun but not so hard that people quit. A good rule: you should be able to beat it in 10–20 attempts. If YOU can't beat it in 5 attempts, it's probably too hard for your friends. If you beat it first try, it's too easy!
+    </div>
+
+    <ul class="checklist">
+      <li>Add spikes with collision detection</li>
+      <li>Add solid blocks the player can land on</li>
+      <li>Add jump pads</li>
+      <li>Add gravity flip portals</li>
+      <li>Create your first level using the level data format</li>
+      <li>Add death animation, respawn, and attempt counter</li>
+      <li>Add a progress bar</li>
+      <li>Playtest and balance the difficulty</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Playable Level</h4>
+      <p>You have a complete level with multiple obstacle types that's genuinely fun to try to beat!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase" data-step="3">
+    <h3>Add Music & Rhythm</h3>
+    <div class="time">⏱ About 1–2 hours</div>
+
+    <p>Music is what transforms a platformer into a <em>rhythm</em> platformer. The obstacles should sync with the beat so that jumping feels like playing an instrument. This is what makes Geometry Dash so addictive.</p>
+
+    <div class="claude-prompt">
+      <code>I want to add music and rhythm to my Neon Dash game. Here's what I need:
+
+1. Background music that plays during the level (I'll provide an MP3 file, or can you use the Web Audio API to generate a simple electronic beat?)
+2. Visual pulse effects that sync to the beat — the background or ground should flash/pulse with the rhythm
+3. The game scroll speed should be synced to the BPM of the music so obstacles naturally land on beats
+4. A screen flash effect when the player dies
+5. A satisfying "ding" sound when the player successfully jumps over a spike (near-miss detection)
+6. A victory jingle when completing the level
+
+For the music, can you use the Tone.js library to generate a simple electronic beat track? Something with a steady kick drum and a synth melody that sounds like a retro game soundtrack. That way we don't need any external music files.</code>
+    </div>
+
+    <div class="tip">
+      If you have a favourite song you'd like to use, you can find royalty-free music on sites like <strong>freesound.org</strong> or <strong>incompetech.com</strong>. Or ask Claude to generate a beat using Tone.js — it won't sound like a hit single, but it's cool that the music is generated by code too!
+    </div>
+
+    <ul class="checklist">
+      <li>Add background music (generated or imported)</li>
+      <li>Sync obstacle placement to the beat</li>
+      <li>Add visual pulse effects on the beat</li>
+      <li>Add sound effects for death and near-misses</li>
+      <li>Add a victory sound and screen</li>
+      <li>Playtest — does jumping feel rhythmic?</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Rhythm Game</h4>
+      <p>Your game now FEELS like Geometry Dash — the obstacles, music, and visuals all pulse together!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase" data-step="4">
+    <h3>Build the Level Editor</h3>
+    <div class="time">⏱ About 2–3 hours</div>
+
+    <p>This is the feature that makes YOUR game special. A built-in level editor lets anyone create their own levels by placing obstacles on a grid. Think about how Geometry Dash's editor works — you pick an obstacle type and tap to place it.</p>
+
+    <div class="claude-prompt">
+      <code>I want to add a level editor to my Neon Dash game. This is the most important feature! Here's what I need:
+
+1. EDITOR MODE — a separate screen (accessible from the main menu) where you can build levels
+2. A GRID VIEW showing the level from a zoomed-out top-down/side view
+3. A TOOLBAR at the bottom with buttons to select obstacle types: Spike, Block, Jump Pad, Gravity Portal, Ground Gap
+4. TAP/CLICK on the grid to place the selected obstacle
+5. TAP an existing obstacle to delete it
+6. DRAG to scroll left/right through the level
+7. A PLAY TEST button that immediately lets you play the level you're building
+8. A SAVE button that saves the level as a JSON string
+9. A SHARE button that encodes the level data into a URL parameter — so you can share a link and the other person's game loads YOUR level automatically
+10. A LOAD button to paste in a level code from someone else
+
+The share system should work like this:
+- When you click Share, it creates a URL like: yourgame.com?level=BASE64ENCODEDDATA
+- When someone opens that link, the game automatically loads and plays that custom level
+- This means friends can share levels just by sending links!
+
+Make the editor touch-friendly for mobile too.</code>
+    </div>
+
+    <div class="tip">
+      The URL-based sharing is the cleverest part. By encoding level data into the URL itself, you don't need any servers or databases — the level IS the link. This is the same technique used by many indie web games. Ask Claude to explain how Base64 encoding works if you're curious!
+    </div>
+
+    <ul class="checklist">
+      <li>Build the grid-based editor view</li>
+      <li>Add the obstacle placement toolbar</li>
+      <li>Add place/delete by tapping</li>
+      <li>Add scrolling through the level</li>
+      <li>Add a Play Test button</li>
+      <li>Add Save/Load with JSON</li>
+      <li>Add the URL-based sharing system</li>
+      <li>Create 3 levels of different difficulties</li>
+      <li>Test sharing — send a level link to your brother and make sure it loads</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Level Creator</h4>
+      <p>You and your friends can now create, share, and play each other's custom levels!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase" data-step="5">
+    <h3>Polish & Game Modes</h3>
+    <div class="time">⏱ About 2 hours</div>
+
+    <p>Time to add the features that make people come back again and again — multiple game modes, difficulty ratings, and visual flair.</p>
+
+    <div class="claude-prompt">
+      <code>Let's add the final polish to Neon Dash! I want:
+
+1. MAIN MENU with options: Play Official Levels, Play Custom Level (enter code), Level Editor, How To Play
+2. 3 OFFICIAL LEVELS I've designed (easy, medium, hard) with star ratings:
+   - 1 star if you complete it
+   - 2 stars if you complete it in under X attempts
+   - 3 stars if you complete it without dying
+3. PRACTICE MODE — play any level with checkpoints (flags placed every 10 seconds of gameplay that you can respawn at)
+4. CUSTOMISATION — let the player change their cube's colour and trail colour from a palette
+5. VISUAL THEMES — different colour schemes for different levels (neon blue, neon pink, neon green)
+6. PARTICLE EFFECTS everywhere — jump particles, death explosion, collect stars, background particles
+7. SCREEN TRANSITIONS — smooth fade/slide between menus and gameplay
+8. A "Best Attempts" tracker for each level (fewest attempts to complete)
+9. Make it installable as a PWA (like Project 3)</code>
+    </div>
+
+    <ul class="checklist">
+      <li>Create the main menu with all options</li>
+      <li>Design 3 official levels (easy / medium / hard)</li>
+      <li>Add the star rating system</li>
+      <li>Add practice mode with checkpoints</li>
+      <li>Add player cube customisation</li>
+      <li>Add particle effects and visual polish</li>
+      <li>Add smooth screen transitions</li>
+      <li>Make it a PWA</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Complete Game</h4>
+      <p>Neon Dash is a fully polished game with menus, modes, customisation, and a level editor!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 6 -->
+  <div class="phase" data-step="6">
+    <h3>Launch & Challenge Your Friends</h3>
+    <div class="time">⏱ About 30 minutes + ongoing fun</div>
+
+    <p>Put it online, create some killer levels, and start the challenge chain!</p>
+
+    <div class="claude-prompt">
+      <code>My Neon Dash game is finished! Can you help me:
+
+1. Host it on GitHub Pages (I already have a GitHub account: akamu47)
+2. Add an "About" page that credits me and my brother as the creators
+3. Create a "Challenge" share format — when you beat a level, you can generate a message like:
+   "🔷 I beat LEVEL NAME in X attempts! Think you can do better? [LINK]"
+   that can be copied or shared on WhatsApp/iMessage
+
+I want my friends to get hooked on trying to beat each other's levels!</code>
+    </div>
+
+    <div class="tip">
+      <strong>The viral loop:</strong> You build a level → share the link → friend plays it → friend builds their own level → shares with more friends. The level editor is what turns your game from something people play once into something that keeps growing. This is the same strategy that made Geometry Dash and Mario Maker huge!
+    </div>
+
+    <ul class="checklist">
+      <li>Publish to GitHub Pages</li>
+      <li>Create 3 levels of increasing difficulty</li>
+      <li>Share the game link with 5 friends</li>
+      <li>Challenge friends to beat your hardest level</li>
+      <li>Get at least 2 friends to build and share their own levels</li>
+      <li>Play each other's levels and compete for lowest attempt counts!</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 FINAL MILESTONE: Game Studio Founders!</h4>
+      <p>You've built a real game with user-generated content and a sharing system. This is how actual game companies work — Roblox, Minecraft, Fortnite Creative, Mario Maker — they're all platforms where players create for each other. You've built the same thing!</p>
+    </div>
+  </div>
+
+  <!-- BONUS -->
+  <div class="share-section">
+    <h3>🎯 BONUS CHALLENGES</h3>
+    <p style="margin-bottom: 15px; color: #ccc;">Want to go even further?</p>
+    <ul class="checklist" style="text-align: left; max-width: 500px; margin: 0 auto;">
+      <li>Add a SHIP MODE (like GD) — hold to fly up, release to fall down</li>
+      <li>Add a WAVE MODE — tap to switch between going up and down</li>
+      <li>Add moving obstacles and saw blades</li>
+      <li>Create a "level of the week" challenge with friends</li>
+      <li>Add a replay system that records your run as a ghost</li>
+      <li>Set up a simple server (ask Claude about Firebase) to host a shared level gallery</li>
+    </ul>
+  </div>
+
+  <div class="intro-box" style="border-color: rgba(255,45,149,0.3);">
+    <h2 style="color: var(--neon-pink);">🧠 What You'll Learn Along The Way</h2>
+    <p><strong>Game Physics</strong> — Gravity, velocity, acceleration, collision detection. These are real physics concepts applied to code. Every platformer ever made uses these same principles.</p>
+    <p style="margin-top: 10px;"><strong>Data Structures</strong> — Levels are stored as structured data (arrays of objects). Understanding how to represent real-world things as data is one of the most fundamental programming skills.</p>
+    <p style="margin-top: 10px;"><strong>Audio Programming</strong> — Syncing gameplay to music, generating sounds with code, and creating satisfying audio feedback. Sound design is one of the most underrated skills in game development.</p>
+    <p style="margin-top: 10px;"><strong>UGC (User-Generated Content)</strong> — Building tools that let OTHER people create things. This is the most powerful concept in modern tech — YouTube, TikTok, Roblox, and Minecraft are all platforms built on this idea.</p>
+    <p style="margin-top: 10px;"><strong>Encoding & Data Sharing</strong> — How to turn complex data into a shareable format (Base64, JSON, URL parameters). This is how the entire internet works — data encoded and sent between computers.</p>
+  </div>
+
+</div>
+
+<footer>
+  Project 4 of 4 — Ed & John's Game Dev Journey — Built with ❤️ by Dad & Claude
+</footer>
+
+<script>
+  document.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', () => li.classList.toggle('done'));
+  });
+</script>
+
+</body>
+</html>

@@ -181,6 +181,9 @@
   .project-card.p3 { border-left: 4px solid #ff006e; }
   .project-card.p3:hover { border-color: #ff006e; box-shadow: 0 10px 40px rgba(255,0,110,0.1); }
 
+  .project-card.p4 { border-left: 4px solid #00d4ff; }
+  .project-card.p4:hover { border-color: #00d4ff; box-shadow: 0 10px 40px rgba(0,212,255,0.1); }
+
   .project-num {
     width: 56px;
     height: 56px;
@@ -196,6 +199,7 @@
   .p1 .project-num { background: rgba(0,245,212,0.12); color: #00f5d4; }
   .p2 .project-num { background: rgba(57,255,20,0.12); color: #39ff14; }
   .p3 .project-num { background: rgba(255,0,110,0.12); color: #ff006e; }
+  .p4 .project-num { background: rgba(0,212,255,0.12); color: #00d4ff; }
 
   .project-info h3 {
     font-size: 1.15rem;
@@ -227,6 +231,7 @@
   }
 
   .tag.beginner { color: #00f5d4; border-color: rgba(0,245,212,0.2); }
+  .tag.intermediate-plus { color: #00d4ff; border-color: rgba(0,212,255,0.2); }
   .tag.intermediate { color: #39ff14; border-color: rgba(57,255,20,0.2); }
   .tag.advanced { color: #ff006e; border-color: rgba(255,0,110,0.2); }
 
@@ -305,7 +310,7 @@
 <div class="content">
 
   <div class="hero">
-    <div class="icon-row">⚔️ 🏗️ 📱</div>
+    <div class="icon-row">⚔️ 🏗️ 📱 🔷</div>
     <h1>
       <span class="line1">ED & JOHN'S</span>
       <span class="line2">GAME DEV JOURNEY</span>
@@ -319,7 +324,7 @@
     </div>
     <div class="progress-label">
       <span>Your Progress</span>
-      <span id="progressText">0 / 3 projects complete</span>
+      <span id="progressText">0 / 4 projects complete</span>
     </div>
   </div>
 
@@ -362,6 +367,20 @@
           <span class="tag advanced">Advanced</span>
           <span class="tag">Canvas / PWA</span>
           <span class="tag">Mobile App</span>
+        </div>
+      </div>
+      <div class="project-arrow">→</div>
+    </a>
+
+    <a href="project-4-geometry-dash.html" class="project-card p4">
+      <div class="project-num">4</div>
+      <div class="project-info">
+        <h3>🔷 Neon Dash</h3>
+        <div class="desc">Build a Geometry Dash-style rhythm platformer with a level editor. Create levels, share them via link, and challenge friends to beat them!</div>
+        <div class="tags">
+          <span class="tag intermediate-plus">Intermediate+</span>
+          <span class="tag">Canvas / Audio</span>
+          <span class="tag">Level Editor</span>
         </div>
       </div>
       <div class="project-arrow">→</div>
@@ -413,9 +432,9 @@
   const text = document.getElementById('progressText');
 
   if (bar && text) {
-    const pct = Math.round((completedProjects / 3) * 100);
+    const pct = Math.round((completedProjects / 4) * 100);
     setTimeout(() => { bar.style.width = pct + '%'; }, 300);
-    text.textContent = completedProjects + ' / 3 projects complete';
+    text.textContent = completedProjects + ' / 4 projects complete';
   }
 </script>
 
