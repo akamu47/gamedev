@@ -26,6 +26,35 @@
     line-height: 1.7;
   }
 
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .top-nav a {
+    color: #888;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .top-nav a:hover { color: #fff; }
+
+  .top-nav .back-link { display: flex; align-items: center; gap: 6px; }
+
+  .top-nav .project-links { display: flex; gap: 12px; }
+
+  .top-nav .project-links a.active { color: var(--neon-green); }
+
   .hero {
     background: linear-gradient(135deg, #1a0a2e 0%, #16213e 40%, #2d1b4e 100%);
     padding: 60px 20px;
@@ -359,6 +388,16 @@
 </style>
 </head>
 <body>
+
+<nav class="top-nav">
+  <a href="index.html" class="back-link">← Home</a>
+  <div class="project-links">
+    <a href="project-1-battle-cards.html">1</a>
+    <a href="project-2-roblox-adventure.html" class="active">2</a>
+    <a href="project-3-mobile-arcade.html">3</a>
+    <a href="project-4-geometry-dash.html">4</a>
+  </div>
+</nav>
 
 <div class="hero">
   <h1>🏗️ ROBLOX BATTLE ARENA</h1>
