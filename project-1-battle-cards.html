@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 1: Battle Cards Online</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --fire: #ff6b35;
+    --electric: #ffd23f;
+    --ice: #3a86ff;
+    --dark: #1a1a2e;
+    --darker: #0f0f1a;
+    --card: #16213e;
+    --glow: #00f5d4;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--darker);
+    color: #e0e0e0;
+    line-height: 1.7;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 60px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 3px solid var(--glow);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0,245,212,0.05) 0%, transparent 50%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+
+  .hero h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: var(--glow);
+    text-shadow: 0 0 20px rgba(0,245,212,0.5);
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .hero .subtitle {
+    font-size: 1.1rem;
+    color: #aaa;
+    margin-top: 10px;
+    position: relative;
+  }
+
+  .hero .badge {
+    display: inline-block;
+    background: var(--fire);
+    color: white;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-top: 15px;
+    position: relative;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px;
+  }
+
+  .intro-box {
+    background: linear-gradient(135deg, var(--card), #1a2744);
+    border: 1px solid rgba(0,245,212,0.2);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 40px;
+  }
+
+  .intro-box h2 {
+    color: var(--electric);
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .intro-box p {
+    color: #bbb;
+    font-size: 1rem;
+  }
+
+  .phase {
+    margin-bottom: 40px;
+    border-left: 3px solid var(--glow);
+    padding-left: 25px;
+    position: relative;
+  }
+
+  .phase::before {
+    content: attr(data-step);
+    position: absolute;
+    left: -18px;
+    top: 0;
+    width: 34px;
+    height: 34px;
+    background: var(--glow);
+    color: var(--darker);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.9rem;
+  }
+
+  .phase h3 {
+    font-size: 1.25rem;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .phase .time {
+    font-size: 0.8rem;
+    color: var(--glow);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .phase p {
+    margin-bottom: 12px;
+    color: #ccc;
+  }
+
+  .claude-prompt {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 15px 0;
+    position: relative;
+  }
+
+  .claude-prompt::before {
+    content: '🤖 Ask Claude';
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--glow);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .claude-prompt code {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #e6db74;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .tip {
+    background: rgba(255,210,63,0.08);
+    border: 1px solid rgba(255,210,63,0.3);
+    border-radius: 10px;
+    padding: 15px 18px;
+    margin: 15px 0;
+    font-size: 0.9rem;
+  }
+
+  .tip::before {
+    content: '💡 Pro Tip';
+    display: block;
+    font-weight: 700;
+    color: var(--electric);
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+  }
+
+  .checklist {
+    list-style: none;
+    margin: 15px 0;
+  }
+
+  .checklist li {
+    padding: 8px 0 8px 30px;
+    position: relative;
+    color: #ccc;
+  }
+
+  .checklist li::before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  .checklist li.done::before {
+    content: '☑';
+    color: var(--glow);
+  }
+
+  .milestone {
+    background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,210,63,0.1));
+    border: 1px solid rgba(255,107,53,0.4);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .milestone h4 {
+    color: var(--fire);
+    font-size: 1rem;
+    margin-bottom: 5px;
+  }
+
+  .milestone p {
+    color: #ccc;
+    font-size: 0.9rem;
+  }
+
+  .card-preview {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+
+  .mini-card {
+    width: 120px;
+    height: 170px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 10px;
+    border: 2px solid;
+    transition: transform 0.2s;
+  }
+
+  .mini-card:hover { transform: translateY(-5px); }
+
+  .mini-card.fire {
+    background: linear-gradient(180deg, #ff6b35 0%, #c44b1a 100%);
+    border-color: #ff9a6c;
+    color: white;
+  }
+
+  .mini-card.ice {
+    background: linear-gradient(180deg, #3a86ff 0%, #1a56cc 100%);
+    border-color: #6ea8ff;
+    color: white;
+  }
+
+  .mini-card.electric {
+    background: linear-gradient(180deg, #ffd23f 0%, #ccaa1f 100%);
+    border-color: #ffe47a;
+    color: #333;
+  }
+
+  .mini-card .emoji { font-size: 2rem; margin-bottom: 5px; }
+  .mini-card .stat { font-size: 0.7rem; opacity: 0.8; margin-top: 5px; }
+
+  .share-section {
+    background: linear-gradient(135deg, #0f3460, #16213e);
+    border: 2px solid var(--glow);
+    border-radius: 16px;
+    padding: 30px;
+    margin: 30px 0;
+    text-align: center;
+  }
+
+  .share-section h3 {
+    color: var(--glow);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px;
+    color: #555;
+    font-size: 0.8rem;
+    border-top: 1px solid #222;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>⚔️ BATTLE CARDS ONLINE</h1>
+  <div class="subtitle">Project 1 — Ed & John's Game Dev Journey</div>
+  <div class="badge">🟢 BEGINNER FRIENDLY</div>
+</div>
+
+<div class="container">
+
+  <div class="intro-box">
+    <h2>What You're Building</h2>
+    <p>A card battle game inspired by Clash Royale — but this one is <strong>yours</strong>. You'll design your own cards, build the game logic, and share it with friends via a link. No downloads needed — anyone with the link can play!</p>
+
+    <div class="card-preview">
+      <div class="mini-card fire">
+        <div class="emoji">🐉</div>
+        Fire Dragon
+        <div class="stat">ATK 8 / DEF 3</div>
+      </div>
+      <div class="mini-card ice">
+        <div class="emoji">🧊</div>
+        Ice Golem
+        <div class="stat">ATK 4 / DEF 9</div>
+      </div>
+      <div class="mini-card electric">
+        <div class="emoji">⚡</div>
+        Thunder Sprite
+        <div class="stat">ATK 7 / DEF 5</div>
+      </div>
+    </div>
+
+    <p>By the end of this project, you'll understand <strong>HTML</strong> (the skeleton of websites), <strong>CSS</strong> (the style and colours), and <strong>JavaScript</strong> (the brain that makes things happen). And you'll learn how to use <strong>Claude</strong> as your coding partner to build anything you can imagine.</p>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase" data-step="1">
+    <h3>Design Your Cards</h3>
+    <div class="time">⏱ About 30–45 minutes</div>
+
+    <p>Every great card game starts with great cards. Before writing any code, grab a piece of paper (or open Notes) and design 8–10 cards. Each card needs a name, an element type (fire, ice, electric, shadow, nature…), an attack value, and a defence value.</p>
+
+    <p>Think about what makes Clash Royale cards fun — some are super powerful attackers but weak on defence, some are tanks, and some have special abilities. Design your own!</p>
+
+    <div class="claude-prompt">
+      <code>I'm 14 and building a card battle game with my brother. We've designed these cards:
+
+- Fire Dragon: ATK 8, DEF 3, Type: Fire
+- Ice Golem: ATK 4, DEF 9, Type: Ice
+- Thunder Sprite: ATK 7, DEF 5, Type: Electric
+[add your cards here]
+
+Can you help me create a single HTML file with CSS that displays these as cool-looking game cards? Make them look like trading cards with a coloured border based on their type. I want it all in one file I can open in my browser.</code>
+    </div>
+
+    <div class="tip">
+      Start with 6–8 cards. You can always add more later! The key to working with Claude is being <strong>specific</strong> about what you want. Tell it the colours, the style, the vibe. The more detail you give, the better the result.
+    </div>
+
+    <ul class="checklist">
+      <li>Design 6–8 cards on paper with names, types, ATK and DEF stats</li>
+      <li>Ask Claude to create the card display HTML</li>
+      <li>Open the file in your browser and check it looks cool</li>
+      <li>Ask Claude to tweak anything you don't like (colours, fonts, layout)</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Card Gallery</h4>
+      <p>You should now have a page that shows all your cards looking like real trading cards!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase" data-step="2">
+    <h3>Build the Battle System</h3>
+    <div class="time">⏱ About 1–2 hours</div>
+
+    <p>Now comes the fun part — making the cards actually fight! You'll add JavaScript that lets two players each draw cards and battle them. This is where your game comes alive.</p>
+
+    <div class="claude-prompt">
+      <code>Now I want to add gameplay to my card battle game. Here's what I want:
+
+1. Two players (Player 1 and Player 2) each get dealt 4 random cards from the deck
+2. Each round, both players pick a card to play
+3. The cards battle — compare ATK of the attacking card vs DEF of the defending card
+4. The winner of the round gets a point
+5. First to 3 points wins the match
+
+Can you add this game logic to my existing HTML file? Keep it all in one file. Add buttons to pick cards and show the battle animation. Make it feel exciting with some visual effects!</code>
+    </div>
+
+    <div class="tip">
+      If Claude gives you code and something doesn't work, don't panic! Copy the error message (right-click the page → Inspect → Console tab) and paste it back to Claude. Say <strong>"I'm getting this error: [paste error]. Can you fix it?"</strong> — this is exactly how real developers work!
+    </div>
+
+    <ul class="checklist">
+      <li>Ask Claude to add the battle system</li>
+      <li>Test it — play a full match against your brother</li>
+      <li>Found a bug? Copy the error and ask Claude to fix it</li>
+      <li>Ask Claude to add sound effects or animations to make battles exciting</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Playable Game</h4>
+      <p>You and your brother can now sit down and play a full card battle match!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase" data-step="3">
+    <h3>Add Special Abilities & Power-Ups</h3>
+    <div class="time">⏱ About 1–2 hours</div>
+
+    <p>Plain attack vs defence gets boring fast. This is where you make YOUR game unique. Think about what special abilities your cards could have. Maybe the Fire Dragon burns the opponent's next card? Maybe the Ice Golem freezes them for a turn?</p>
+
+    <div class="claude-prompt">
+      <code>I want to add special abilities to my cards. Here are my ideas:
+
+- Fire Dragon: "Burn" — reduces the opponent's next card's DEF by 2
+- Ice Golem: "Freeze" — opponent skips their next turn
+- Thunder Sprite: "Chain Lightning" — deals 3 extra damage if played after another Electric card
+- [your ideas here]
+
+Can you add these abilities to the game? Show the ability name and effect on each card, and make the abilities trigger during battle with a cool visual effect.</code>
+    </div>
+
+    <ul class="checklist">
+      <li>Come up with at least 4 special abilities</li>
+      <li>Ask Claude to code them into the game</li>
+      <li>Playtest — are any abilities too overpowered?</li>
+      <li>Ask Claude to help balance them if needed</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Strategic Depth</h4>
+      <p>Your game now has real strategy — which card you play and when actually matters!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase" data-step="4">
+    <h3>Make It Look Amazing</h3>
+    <div class="time">⏱ About 1 hour</div>
+
+    <p>Time to polish. You want your friends to open the game and go <em>"woah, you made this?!"</em>. Ask Claude to help you add particle effects, a dark gaming theme, card flip animations, and a proper win screen.</p>
+
+    <div class="claude-prompt">
+      <code>Can you make my card game look really polished and professional? I want:
+
+1. A dark, gaming-themed background with subtle particle effects
+2. Cards that flip over with an animation when revealed
+3. A dramatic "VS" screen when two cards battle
+4. Screen shake when a powerful attack hits
+5. A victory screen with confetti when someone wins
+6. A cool title screen with a "Start Game" button
+
+Make it look like a real game you'd find online!</code>
+    </div>
+
+    <ul class="checklist">
+      <li>Ask Claude to add visual polish and animations</li>
+      <li>Add a title screen and victory screen</li>
+      <li>Add background music or battle sound effects (optional)</li>
+      <li>Get your dad to playtest and give feedback!</li>
+    </ul>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase" data-step="5">
+    <h3>Share It With Friends</h3>
+    <div class="time">⏱ About 30 minutes</div>
+
+    <p>Here's the best part — sharing your creation. You can put your game online for free so anyone with the link can play it!</p>
+
+    <div class="claude-prompt">
+      <code>My card battle game is finished and I want to share it with my friends. Can you explain step by step how to put my HTML game online for free using GitHub Pages? I've never used GitHub before. I want a link I can send to my friends so they can play it in their browser.</code>
+    </div>
+
+    <div class="tip">
+      <strong>Alternative quick share:</strong> You can also use <a href="https://neocities.org" style="color: var(--electric)">Neocities.org</a> which is even simpler — just drag and drop your HTML file and you get a link. Or ask Claude about other free hosting options!
+    </div>
+
+    <ul class="checklist">
+      <li>Set up free hosting (GitHub Pages, Neocities, or similar)</li>
+      <li>Upload your game</li>
+      <li>Test the link on your phone and your brother's phone</li>
+      <li>Send the link to 3 friends</li>
+      <li>Watch them play and collect feedback!</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 FINAL MILESTONE: Published Game Developer!</h4>
+      <p>You've just built and published a real game that anyone in the world can play. You're a game developer now!</p>
+    </div>
+  </div>
+
+  <!-- SHARE SECTION -->
+  <div class="share-section">
+    <h3>🎯 BONUS CHALLENGES</h3>
+    <p style="margin-bottom: 15px; color: #ccc;">Finished the main game? Try asking Claude to help you add these:</p>
+    <ul class="checklist" style="text-align: left; max-width: 500px; margin: 0 auto;">
+      <li>An AI opponent so you can play single-player</li>
+      <li>A card collection / deck builder screen</li>
+      <li>Rare and legendary card rarities with special borders</li>
+      <li>A "create your own card" feature for friends</li>
+      <li>Online multiplayer (ask Claude about WebSockets!)</li>
+    </ul>
+  </div>
+
+  <div class="intro-box" style="border-color: rgba(255,107,53,0.3);">
+    <h2 style="color: var(--fire);">🧠 What You'll Learn Along The Way</h2>
+    <p><strong>HTML</strong> — The building blocks of every website. You'll learn how to structure a page with elements like headers, divs, and buttons.</p>
+    <p style="margin-top: 10px;"><strong>CSS</strong> — How to make things look incredible. Colours, fonts, animations, layouts — CSS controls all of it.</p>
+    <p style="margin-top: 10px;"><strong>JavaScript</strong> — The programming language that makes web pages interactive. You'll learn variables, functions, if/else logic, and arrays — the same concepts used in every programming language.</p>
+    <p style="margin-top: 10px;"><strong>Working with AI</strong> — How to describe what you want clearly so Claude can help you build it. This skill is going to be incredibly valuable for your future!</p>
+  </div>
+
+</div>
+
+<footer>
+  Project 1 of 3 — Ed & John's Game Dev Journey — Built with ❤️ by Dad & Claude
+</footer>
+
+<script>
+  // Make checklist items clickable
+  document.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', () => {
+      li.classList.toggle('done');
+    });
+  });
+</script>
+
+</body>
+</html>

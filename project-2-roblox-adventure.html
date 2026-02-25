@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 2: Roblox Battle Arena</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --roblox-red: #e2231a;
+    --roblox-dark: #393b3d;
+    --neon-green: #39ff14;
+    --neon-purple: #bf40bf;
+    --dark: #111;
+    --darker: #0a0a0a;
+    --card: #1a1a1a;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--darker);
+    color: #e0e0e0;
+    line-height: 1.7;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #1a0a2e 0%, #16213e 40%, #2d1b4e 100%);
+    padding: 60px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 3px solid var(--neon-green);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(57,255,20,0.03) 2px,
+      rgba(57,255,20,0.03) 4px
+    );
+  }
+
+  .hero h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(1.3rem, 4vw, 2.2rem);
+    color: var(--neon-green);
+    text-shadow: 0 0 20px rgba(57,255,20,0.5);
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .hero .subtitle {
+    font-size: 1.1rem;
+    color: #aaa;
+    margin-top: 10px;
+    position: relative;
+  }
+
+  .hero .badge {
+    display: inline-block;
+    background: var(--neon-purple);
+    color: white;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-top: 15px;
+    position: relative;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px;
+  }
+
+  .intro-box {
+    background: linear-gradient(135deg, var(--card), #1f1f2f);
+    border: 1px solid rgba(57,255,20,0.2);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 40px;
+  }
+
+  .intro-box h2 {
+    color: var(--neon-green);
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .intro-box p {
+    color: #bbb;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .prereq {
+    background: rgba(226,35,26,0.1);
+    border: 1px solid rgba(226,35,26,0.4);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .prereq h4 {
+    color: var(--roblox-red);
+    margin-bottom: 8px;
+  }
+
+  .prereq ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .prereq ul li {
+    padding: 5px 0 5px 25px;
+    position: relative;
+    color: #ccc;
+  }
+
+  .prereq ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--roblox-red);
+    font-weight: 700;
+  }
+
+  .phase {
+    margin-bottom: 40px;
+    border-left: 3px solid var(--neon-green);
+    padding-left: 25px;
+    position: relative;
+  }
+
+  .phase::before {
+    content: attr(data-step);
+    position: absolute;
+    left: -18px;
+    top: 0;
+    width: 34px;
+    height: 34px;
+    background: var(--neon-green);
+    color: var(--darker);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.9rem;
+  }
+
+  .phase h3 {
+    font-size: 1.25rem;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .phase .time {
+    font-size: 0.8rem;
+    color: var(--neon-green);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .phase p {
+    margin-bottom: 12px;
+    color: #ccc;
+  }
+
+  .claude-prompt {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 15px 0;
+    position: relative;
+  }
+
+  .claude-prompt::before {
+    content: '🤖 Ask Claude';
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--neon-green);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .claude-prompt code {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #e6db74;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .tip {
+    background: rgba(191,64,191,0.08);
+    border: 1px solid rgba(191,64,191,0.3);
+    border-radius: 10px;
+    padding: 15px 18px;
+    margin: 15px 0;
+    font-size: 0.9rem;
+  }
+
+  .tip::before {
+    content: '💡 Pro Tip';
+    display: block;
+    font-weight: 700;
+    color: var(--neon-purple);
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+  }
+
+  .warning {
+    background: rgba(255,165,0,0.08);
+    border: 1px solid rgba(255,165,0,0.3);
+    border-radius: 10px;
+    padding: 15px 18px;
+    margin: 15px 0;
+    font-size: 0.9rem;
+  }
+
+  .warning::before {
+    content: '⚠️ Important';
+    display: block;
+    font-weight: 700;
+    color: orange;
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+  }
+
+  .checklist {
+    list-style: none;
+    margin: 15px 0;
+  }
+
+  .checklist li {
+    padding: 8px 0 8px 30px;
+    position: relative;
+    color: #ccc;
+    cursor: pointer;
+  }
+
+  .checklist li::before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    font-size: 1.1rem;
+  }
+
+  .checklist li.done::before {
+    content: '☑';
+    color: var(--neon-green);
+  }
+
+  .milestone {
+    background: linear-gradient(135deg, rgba(57,255,20,0.1), rgba(191,64,191,0.08));
+    border: 1px solid rgba(57,255,20,0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .milestone h4 {
+    color: var(--neon-green);
+    font-size: 1rem;
+    margin-bottom: 5px;
+  }
+
+  .milestone p {
+    color: #ccc;
+    font-size: 0.9rem;
+  }
+
+  .lua-snippet {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 15px 0;
+    position: relative;
+  }
+
+  .lua-snippet::before {
+    content: '📝 Lua Code Example';
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #58a6ff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .lua-snippet code {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: #7ee787;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .game-concept {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+
+  .concept-card {
+    background: linear-gradient(180deg, #1a1a2e, #16213e);
+    border: 1px solid rgba(57,255,20,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .concept-card .emoji { font-size: 2.5rem; margin-bottom: 10px; }
+  .concept-card h5 { color: var(--neon-green); margin-bottom: 5px; }
+  .concept-card p { font-size: 0.85rem; color: #999; }
+
+  .share-section {
+    background: linear-gradient(135deg, #1a0a2e, #16213e);
+    border: 2px solid var(--neon-green);
+    border-radius: 16px;
+    padding: 30px;
+    margin: 30px 0;
+    text-align: center;
+  }
+
+  .share-section h3 {
+    color: var(--neon-green);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px;
+    color: #555;
+    font-size: 0.8rem;
+    border-top: 1px solid #222;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🏗️ ROBLOX BATTLE ARENA</h1>
+  <div class="subtitle">Project 2 — Ed & John's Game Dev Journey</div>
+  <div class="badge">🟡 INTERMEDIATE</div>
+</div>
+
+<div class="container">
+
+  <div class="intro-box">
+    <h2>What You're Building</h2>
+    <p>A multiplayer battle arena game on Roblox — the platform where your friends already hang out! You'll build an arena where players fight with special weapons and abilities, complete with a lobby, scoreboard, and rounds system.</p>
+    <p>You already know Roblox as a player. Now you're going to learn how it works from the <strong>creator's side</strong>. The scripting language is called <strong>Lua</strong> — it's simpler than most programming languages and Claude is really good at helping you write it.</p>
+
+    <div class="game-concept">
+      <div class="concept-card">
+        <div class="emoji">🏟️</div>
+        <h5>Battle Arena</h5>
+        <p>Design a map where players fight</p>
+      </div>
+      <div class="concept-card">
+        <div class="emoji">⚔️</div>
+        <h5>Weapons & Abilities</h5>
+        <p>Custom swords, bows, and magic</p>
+      </div>
+      <div class="concept-card">
+        <div class="emoji">🏆</div>
+        <h5>Rounds & Scoring</h5>
+        <p>Timed rounds with a leaderboard</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="prereq">
+    <h4>Before You Start — What You'll Need</h4>
+    <ul>
+      <li><strong>Roblox Studio</strong> — Free download from <a href="https://create.roblox.com" style="color: var(--neon-green);">create.roblox.com</a></li>
+      <li><strong>A Roblox account</strong> (you probably already have one!)</li>
+      <li><strong>Claude</strong> open in another tab to help you write Lua scripts</li>
+      <li>Complete Project 1 first so you understand the basics of coding with Claude</li>
+    </ul>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase" data-step="1">
+    <h3>Learn Roblox Studio Basics</h3>
+    <div class="time">⏱ About 1 hour</div>
+
+    <p>Open Roblox Studio and create a new "Baseplate" project. Spend some time just exploring — click on things, drag parts around, change colours. It's like a 3D Minecraft editor. Get comfortable with the toolbox before you start scripting.</p>
+
+    <div class="claude-prompt">
+      <code>I'm 14 and just opened Roblox Studio for the first time. I want to learn the basics so I can build a battle arena game. Can you give me a beginner walkthrough of:
+
+1. What the main panels are (Explorer, Properties, Toolbox)
+2. How to add and move parts (blocks, spheres, etc)
+3. How to change colours and materials
+4. How to test/play my game inside Studio
+
+Keep it simple and step-by-step. I learn by doing, so give me small tasks to try as I go!</code>
+    </div>
+
+    <div class="tip">
+      Roblox Studio looks overwhelming at first, but you only need to know a few panels. The <strong>Explorer</strong> panel shows everything in your game (like a file browser). The <strong>Properties</strong> panel lets you change any object. That's 80% of what you need!
+    </div>
+
+    <ul class="checklist">
+      <li>Download and open Roblox Studio</li>
+      <li>Create a new Baseplate project</li>
+      <li>Add some Parts and change their colours and sizes</li>
+      <li>Learn to move, rotate, and scale objects</li>
+      <li>Press Play to test walking around your creation</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Studio Explorer</h4>
+      <p>You can navigate Roblox Studio, add objects, and test your game!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase" data-step="2">
+    <h3>Build Your Arena Map</h3>
+    <div class="time">⏱ About 2–3 hours</div>
+
+    <p>Now design your battle arena! Think about what makes a great fighting map — it needs cover spots, elevated areas, open spaces, and maybe some hazards. Look at maps you like in Fortnite or other games for inspiration.</p>
+
+    <div class="claude-prompt">
+      <code>I'm building a battle arena map in Roblox Studio. I want it to have:
+
+- A central open area for fighting
+- 4 raised platforms around the edges with ramps
+- Some walls and barriers for cover
+- A lava pit in the middle that damages players
+- Spawn points for 2 teams (red and blue)
+- Cool neon lighting
+
+Can you give me step-by-step instructions to build this in Roblox Studio? Tell me exact sizes for the parts and where to place them. Also, how do I add spawn points?</code>
+    </div>
+
+    <p>Feel free to customise the arena however you want! Claude can help you with any design ideas — floating islands, underwater arenas, space stations, whatever you can imagine.</p>
+
+    <div class="claude-prompt">
+      <code>I want to add a script that makes my lava pit actually damage players when they touch it. The lava part is called "LavaPit" in my Explorer panel. Can you write a Lua script that:
+
+1. Detects when a player touches the lava
+2. Reduces their health by 10 every second they're standing on it
+3. Makes the lava glow and pulse
+
+Where do I put this script in Roblox Studio?</code>
+    </div>
+
+    <div class="lua-snippet">
+      <code>-- This is what a simple Lua script looks like in Roblox
+-- Don't worry about memorising this — Claude will write it for you!
+
+local lava = script.Parent
+
+lava.Touched:Connect(function(hit)
+    local character = hit.Parent
+    local humanoid = character:FindFirstChild("Humanoid")
+    if humanoid then
+        humanoid:TakeDamage(10)
+    end
+end)</code>
+    </div>
+
+    <ul class="checklist">
+      <li>Design your arena layout (sketch it on paper first!)</li>
+      <li>Build the main structures in Studio</li>
+      <li>Add spawn points for each team</li>
+      <li>Add at least one hazard (lava, spikes, etc) with a damage script</li>
+      <li>Test by playing in Studio — walk around and check everything feels right</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Arena Built</h4>
+      <p>You have a complete arena map with hazards and spawn points!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase" data-step="3">
+    <h3>Add Weapons & Combat</h3>
+    <div class="time">⏱ About 2–3 hours</div>
+
+    <p>Now the really exciting part — weapons! You'll create custom tools (Roblox's word for items players can hold and use) with real game mechanics.</p>
+
+    <div class="claude-prompt">
+      <code>I want to create custom weapons for my Roblox battle arena. Can you help me make:
+
+1. A SWORD — swings when you click, deals 25 damage, has a cool swing animation
+2. A BOW — shoots an arrow projectile that flies forward and deals 15 damage on hit
+3. A SHIELD — hold to block incoming damage (reduces damage by 50%)
+
+For each weapon, please give me:
+- The full Lua script
+- Step-by-step instructions for where to put the script in Roblox Studio
+- How to make the weapon appear in the player's inventory
+
+I'm a beginner with Lua, so please explain what each part of the code does!</code>
+    </div>
+
+    <div class="warning">
+      Roblox weapons can be tricky because of the client-server model (some code runs on each player's computer, some on Roblox's servers). If things aren't working right, tell Claude you're having issues and paste any errors from the Output panel in Studio. Ask Claude to explain the difference between LocalScripts and Scripts.
+    </div>
+
+    <ul class="checklist">
+      <li>Create at least 2 weapons (sword and one ranged weapon)</li>
+      <li>Test each weapon works in Play mode</li>
+      <li>Ask Claude to help you balance the damage numbers</li>
+      <li>Add a weapon pickup system so weapons spawn in the arena</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Combat Ready</h4>
+      <p>Players can pick up weapons and fight each other in your arena!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase" data-step="4">
+    <h3>Build the Game Loop</h3>
+    <div class="time">⏱ About 2 hours</div>
+
+    <p>Right now your game is just an open arena. A proper game needs structure — a lobby where players wait, timed rounds, a scoreboard, and win conditions. This is where your game goes from "playground" to "real game".</p>
+
+    <div class="claude-prompt">
+      <code>I need a proper game loop for my Roblox battle arena. Here's what I want:
+
+1. LOBBY PHASE: Players spawn in a safe lobby area and wait. Show a countdown timer ("Game starts in 30 seconds" or "Waiting for 2+ players")
+2. BATTLE PHASE: Teleport all players into the arena. Give them weapons. Round lasts 3 minutes.
+3. Players get 1 point per elimination. Show a live scoreboard on screen.
+4. END PHASE: When time runs out, announce the winner, show final scores, teleport everyone back to lobby.
+5. Repeat!
+
+Can you write the full game management script? I need it to work with multiple players joining and leaving at any time.</code>
+    </div>
+
+    <ul class="checklist">
+      <li>Create a lobby area separate from the arena</li>
+      <li>Add the round management system</li>
+      <li>Add a working scoreboard/leaderboard</li>
+      <li>Add a countdown timer display</li>
+      <li>Test the full loop: lobby → fight → results → lobby</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Full Game Loop</h4>
+      <p>Your game has proper rounds with a lobby, timer, scoring, and win announcements!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase" data-step="5">
+    <h3>Polish & Publish</h3>
+    <div class="time">⏱ About 1–2 hours</div>
+
+    <p>Time to make it shine and get it on Roblox for your friends to play!</p>
+
+    <div class="claude-prompt">
+      <code>My Roblox battle arena is almost done! Can you help me:
+
+1. Create a cool game thumbnail and title screen
+2. Add particle effects for weapon hits and eliminations
+3. Add background music and sound effects
+4. Write a game description for the Roblox page
+
+Also, can you walk me through exactly how to publish my game on Roblox so my friends can find and play it? I want to make it public so anyone can join.</code>
+    </div>
+
+    <div class="tip">
+      When you publish, start by sharing with just your friends first. Ask them what they think and what they'd change. Real game developers call this <strong>"playtesting"</strong> and it's the most important step! Every big game you've ever played went through hundreds of rounds of playtesting.
+    </div>
+
+    <ul class="checklist">
+      <li>Add visual effects and sounds</li>
+      <li>Create a game icon and thumbnail</li>
+      <li>Publish to Roblox (File → Publish to Roblox)</li>
+      <li>Set the game to Public</li>
+      <li>Send the game link to 5 friends</li>
+      <li>Play together and collect feedback!</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 FINAL MILESTONE: Published Roblox Developer!</h4>
+      <p>Your battle arena is live on Roblox! Your friends can find it, play it, and you can keep adding to it!</p>
+    </div>
+  </div>
+
+  <!-- BONUS -->
+  <div class="share-section">
+    <h3>🎯 BONUS CHALLENGES</h3>
+    <p style="margin-bottom: 15px; color: #ccc;">Already published? Keep building!</p>
+    <ul class="checklist" style="text-align: left; max-width: 500px; margin: 0 auto;">
+      <li>Add a shop where players can buy cosmetic skins</li>
+      <li>Create different arena maps that rotate each round</li>
+      <li>Add special abilities (speed boost, invisibility, double jump)</li>
+      <li>Create a progression system with levels and XP</li>
+      <li>Add a "spectator mode" for eliminated players</li>
+    </ul>
+  </div>
+
+  <div class="intro-box" style="border-color: rgba(191,64,191,0.3);">
+    <h2 style="color: var(--neon-purple);">🧠 What You'll Learn Along The Way</h2>
+    <p><strong>Lua Programming</strong> — The scripting language used by Roblox (and also used in many other game engines). You'll learn variables, functions, events, and loops.</p>
+    <p style="margin-top: 10px;"><strong>3D Game Design</strong> — How to think about spaces, player movement, and game feel. Where do you put cover? How big should the arena be? This is game design thinking.</p>
+    <p style="margin-top: 10px;"><strong>Client-Server Architecture</strong> — How multiplayer games actually work behind the scenes. Some code runs on the player's computer, some on the server. This is a concept used in ALL online games and apps.</p>
+    <p style="margin-top: 10px;"><strong>Debugging</strong> — Things WILL break. Learning to read error messages, ask Claude the right questions, and systematically fix problems is the #1 most valuable skill in programming.</p>
+  </div>
+
+</div>
+
+<footer>
+  Project 2 of 3 — Ed & John's Game Dev Journey — Built with ❤️ by Dad & Claude
+</footer>
+
+<script>
+  document.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', () => li.classList.toggle('done'));
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 3: Mobile Arcade App</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --pink: #ff006e;
+    --cyan: #00f5d4;
+    --yellow: #fee440;
+    --purple: #7b2ff7;
+    --dark: #0d0221;
+    --darker: #080016;
+    --card: #130a2e;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--darker);
+    color: #e0e0e0;
+    line-height: 1.7;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #0d0221 0%, #1a0533 40%, #2d0a4e 100%);
+    padding: 60px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 3px solid var(--pink);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 50%, rgba(255,0,110,0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(123,47,247,0.1) 0%, transparent 50%);
+  }
+
+  .hero h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(1.3rem, 4vw, 2.2rem);
+    background: linear-gradient(90deg, var(--pink), var(--cyan), var(--yellow));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .hero .subtitle {
+    font-size: 1.1rem;
+    color: #aaa;
+    margin-top: 10px;
+    position: relative;
+  }
+
+  .hero .badge {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--pink), var(--purple));
+    color: white;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-top: 15px;
+    position: relative;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px;
+  }
+
+  .intro-box {
+    background: linear-gradient(135deg, var(--card), #1a0e3a);
+    border: 1px solid rgba(255,0,110,0.2);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 40px;
+  }
+
+  .intro-box h2 {
+    color: var(--pink);
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .intro-box p {
+    color: #bbb;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .phone-mockup {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 25px 0;
+  }
+
+  .phone {
+    width: 140px;
+    height: 250px;
+    background: #1a1a2e;
+    border: 3px solid #333;
+    border-radius: 20px;
+    padding: 15px 10px;
+    position: relative;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 5px;
+    background: #333;
+    border-radius: 5px;
+  }
+
+  .phone .game-icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+  }
+
+  .phone .game-name {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .phone .game-desc {
+    font-size: 0.6rem;
+    color: #888;
+    margin-top: 3px;
+  }
+
+  .phase {
+    margin-bottom: 40px;
+    border-left: 3px solid var(--pink);
+    padding-left: 25px;
+    position: relative;
+  }
+
+  .phase::before {
+    content: attr(data-step);
+    position: absolute;
+    left: -18px;
+    top: 0;
+    width: 34px;
+    height: 34px;
+    background: var(--pink);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.9rem;
+  }
+
+  .phase h3 {
+    font-size: 1.25rem;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .phase .time {
+    font-size: 0.8rem;
+    color: var(--pink);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .phase p {
+    margin-bottom: 12px;
+    color: #ccc;
+  }
+
+  .claude-prompt {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 15px 0;
+    position: relative;
+  }
+
+  .claude-prompt::before {
+    content: '🤖 Ask Claude';
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--pink);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .claude-prompt code {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #e6db74;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .tip {
+    background: rgba(0,245,212,0.06);
+    border: 1px solid rgba(0,245,212,0.3);
+    border-radius: 10px;
+    padding: 15px 18px;
+    margin: 15px 0;
+    font-size: 0.9rem;
+  }
+
+  .tip::before {
+    content: '💡 Pro Tip';
+    display: block;
+    font-weight: 700;
+    color: var(--cyan);
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+  }
+
+  .checklist {
+    list-style: none;
+    margin: 15px 0;
+  }
+
+  .checklist li {
+    padding: 8px 0 8px 30px;
+    position: relative;
+    color: #ccc;
+    cursor: pointer;
+  }
+
+  .checklist li::before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    font-size: 1.1rem;
+  }
+
+  .checklist li.done::before {
+    content: '☑';
+    color: var(--cyan);
+  }
+
+  .milestone {
+    background: linear-gradient(135deg, rgba(255,0,110,0.1), rgba(123,47,247,0.08));
+    border: 1px solid rgba(255,0,110,0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .milestone h4 {
+    color: var(--pink);
+    font-size: 1rem;
+    margin-bottom: 5px;
+  }
+
+  .milestone p {
+    color: #ccc;
+    font-size: 0.9rem;
+  }
+
+  .pwa-explainer {
+    background: linear-gradient(135deg, rgba(123,47,247,0.1), rgba(255,0,110,0.05));
+    border: 1px solid rgba(123,47,247,0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .pwa-explainer h4 {
+    color: var(--purple);
+    margin-bottom: 8px;
+  }
+
+  .share-section {
+    background: linear-gradient(135deg, #0d0221, #1a0533);
+    border: 2px solid var(--pink);
+    border-radius: 16px;
+    padding: 30px;
+    margin: 30px 0;
+    text-align: center;
+  }
+
+  .share-section h3 {
+    color: var(--pink);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .game-tile {
+    background: linear-gradient(180deg, #1a0e3a, #0d0221);
+    border: 1px solid rgba(255,0,110,0.2);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .game-tile:hover {
+    transform: translateY(-3px);
+    border-color: var(--pink);
+  }
+
+  .game-tile .emoji { font-size: 2rem; margin-bottom: 8px; }
+  .game-tile h5 { color: #fff; font-size: 0.85rem; margin-bottom: 4px; }
+  .game-tile p { font-size: 0.75rem; color: #888; }
+
+  footer {
+    text-align: center;
+    padding: 30px;
+    color: #555;
+    font-size: 0.8rem;
+    border-top: 1px solid #222;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>📱 MOBILE ARCADE APP</h1>
+  <div class="subtitle">Project 3 — Ed & John's Game Dev Journey</div>
+  <div class="badge">🔴 ADVANCED</div>
+</div>
+
+<div class="container">
+
+  <div class="intro-box">
+    <h2>What You're Building</h2>
+    <p>A mobile arcade app — a collection of mini-games that your friends can play on their phones. Think of it like a custom game hub with games <strong>you</strong> designed. It installs on any phone like a real app, but it's actually a website — no app store needed!</p>
+
+    <div class="phone-mockup">
+      <div class="phone">
+        <div class="game-icon">🎮</div>
+        <div class="game-name">Ed & John's Arcade</div>
+        <div class="game-desc">3 games inside!</div>
+      </div>
+      <div class="phone">
+        <div class="game-icon">🐍</div>
+        <div class="game-name">Neon Snake</div>
+        <div class="game-desc">Beat the high score</div>
+      </div>
+      <div class="phone">
+        <div class="game-icon">🧱</div>
+        <div class="game-name">Block Breaker</div>
+        <div class="game-desc">Smash all blocks</div>
+      </div>
+    </div>
+
+    <p>This project teaches you about <strong>Progressive Web Apps (PWAs)</strong> — the same technology used by companies like Twitter and Starbucks for their mobile apps. You'll also learn about <strong>touch controls</strong>, <strong>responsive design</strong> (making things work on any screen size), and the <strong>Canvas API</strong> for drawing game graphics.</p>
+  </div>
+
+  <div class="pwa-explainer">
+    <h4>💡 What's a PWA (Progressive Web App)?</h4>
+    <p style="color: #ccc;">A PWA is a website that can be "installed" on a phone and acts just like a real app — it has an icon on the home screen, works full-screen, and can even work offline. The best part? You don't need to pay Apple or Google to put it in their app stores. Just share a link and your friends can install it instantly!</p>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase" data-step="1">
+    <h3>Build the Arcade Menu</h3>
+    <div class="time">⏱ About 1 hour</div>
+
+    <p>First, you'll create the main menu — a slick-looking home screen that shows all your games as tiles. This is the first thing people see when they open your app, so make it look cool!</p>
+
+    <div class="claude-prompt">
+      <code>I'm building a mobile arcade app as a PWA. I want to start with the main menu screen. Can you create a single HTML file that:
+
+1. Shows a cool title "Ed & John's Arcade" with a gaming font
+2. Has a grid of game tiles (like app icons) for 3 games:
+   - Neon Snake (🐍)
+   - Block Breaker (🧱)
+   - Tap Blitz (⚡)
+3. Each tile should light up when tapped
+4. Uses a dark/neon gaming theme that looks awesome on phones
+5. Is responsive — works on any screen size
+6. Includes the PWA manifest and service worker so it can be installed on a phone
+
+Make it all in one HTML file. I want it to look like a real gaming app!</code>
+    </div>
+
+    <div class="tip">
+      Test on your actual phone! The easiest way during development: ask Claude how to use <strong>GitHub Pages</strong> or <strong>Neocities</strong> to host your file, then open the link on your phone. You can also ask Claude about using <strong>"python -m http.server"</strong> to test locally.
+    </div>
+
+    <ul class="checklist">
+      <li>Create the arcade menu HTML file</li>
+      <li>Open it in your phone's browser</li>
+      <li>Check it looks great on mobile</li>
+      <li>Try "Add to Home Screen" to install it like an app</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: App Shell</h4>
+      <p>You have a mobile app that installs on your phone with a game menu!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase" data-step="2">
+    <h3>Build Game 1: Neon Snake</h3>
+    <div class="time">⏱ About 2 hours</div>
+
+    <p>Your first mini-game is a modern take on the classic Snake game — with neon graphics and touch controls. This will teach you about the HTML Canvas (where you draw game graphics), game loops, and handling touch input on phones.</p>
+
+    <div class="claude-prompt">
+      <code>I want to build a Neon Snake game for my mobile arcade. It should be in a single HTML file that I can link from my arcade menu. Here's what I want:
+
+1. A snake that the player controls by SWIPING on the screen (up/down/left/right)
+2. Neon green snake on a dark background with a subtle grid
+3. Glowing food dots that the snake eats to grow
+4. Score counter at the top
+5. The snake speeds up slightly as it gets longer
+6. Game over screen with final score and "Play Again" button
+7. Save the high score using a variable so it persists during the session
+8. Trail effect behind the snake that fades out (like a glow trail)
+
+Use the HTML Canvas for the graphics. Make the canvas fill the whole screen on mobile. Add touch/swipe controls that feel responsive.</code>
+    </div>
+
+    <div class="tip">
+      <strong>Touch controls are tricky!</strong> If swiping doesn't feel right, tell Claude exactly what's wrong: "The swipe detection is too sensitive" or "There's a delay between my swipe and the snake turning". Be specific — that's how you get the best help from Claude.
+    </div>
+
+    <ul class="checklist">
+      <li>Build the Neon Snake game</li>
+      <li>Add touch/swipe controls</li>
+      <li>Test on your phone — does swiping feel good?</li>
+      <li>Link it from the arcade menu so tapping the Snake tile opens the game</li>
+      <li>Add a "Back to Menu" button</li>
+      <li>Challenge your brother to beat your high score!</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: First Mini-Game</h4>
+      <p>You have a working Snake game with touch controls in your arcade!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase" data-step="3">
+    <h3>Build Game 2: Block Breaker</h3>
+    <div class="time">⏱ About 2 hours</div>
+
+    <p>A Breakout-style game where you move a paddle to bounce a ball into coloured blocks. This teaches you about collision detection — how the game knows when the ball hits a block or the paddle. This concept is used in almost every game ever made!</p>
+
+    <div class="claude-prompt">
+      <code>Now I want to build a Block Breaker game (like Breakout/Arkanoid) for my mobile arcade. Single HTML file. Here's what I want:
+
+1. A paddle at the bottom that moves left/right by touching and dragging on the screen
+2. A ball that bounces off walls, the paddle, and blocks
+3. 5 rows of coloured blocks at the top (each row a different colour)
+4. Blocks disappear when the ball hits them and give points
+5. Some blocks take 2 hits to break (they change colour on first hit)
+6. Ball speeds up slightly each time you clear a row
+7. 3 lives — lose one when the ball goes below the paddle
+8. Particle explosion effect when blocks break
+9. Power-ups that occasionally drop from broken blocks:
+   - Wide paddle (makes paddle bigger for 10 seconds)
+   - Multi-ball (splits into 3 balls)
+
+Use Canvas, make it fullscreen on mobile, with touch controls.</code>
+    </div>
+
+    <ul class="checklist">
+      <li>Build the Block Breaker game</li>
+      <li>Test paddle touch controls — does dragging feel smooth?</li>
+      <li>Add power-ups</li>
+      <li>Link it from the arcade menu</li>
+      <li>Play 10 rounds and adjust difficulty if too hard/easy</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Two-Game Arcade</h4>
+      <p>Your arcade now has two fully playable games!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase" data-step="4">
+    <h3>Build Game 3: Tap Blitz (Your Own Invention!)</h3>
+    <div class="time">⏱ About 2–3 hours</div>
+
+    <p>This is YOUR game — not a remake of something that already exists. Sit down with your brother and invent a game concept. What would be fun? What would make your friends keep playing? Here are some ideas to get you started, but come up with your own!</p>
+
+    <div class="game-grid">
+      <div class="game-tile">
+        <div class="emoji">⚡</div>
+        <h5>Tap Blitz</h5>
+        <p>Tap targets as fast as possible before time runs out</p>
+      </div>
+      <div class="game-tile">
+        <div class="emoji">🌀</div>
+        <h5>Orbit Dodge</h5>
+        <p>Your ship orbits a planet — tap to reverse direction to dodge obstacles</p>
+      </div>
+      <div class="game-tile">
+        <div class="emoji">🎨</div>
+        <h5>Colour Match</h5>
+        <p>Match the colour of falling blocks by tapping the right zone</p>
+      </div>
+      <div class="game-tile">
+        <div class="emoji">🧩</div>
+        <h5>Stack Attack</h5>
+        <p>Tap to drop blocks — stack them perfectly without toppling</p>
+      </div>
+    </div>
+
+    <div class="claude-prompt">
+      <code>My brother and I invented a game called [YOUR GAME NAME]. Here's how it works:
+
+[Describe your game idea in as much detail as you can — what does the player do? How do they control it? How do they score? How does it get harder? What makes it fun?]
+
+Can you build this as a single HTML file for our mobile arcade? Use Canvas for the graphics, touch controls for mobile, and our neon gaming theme. Include a score system and a game over screen.
+
+If any part of our game idea doesn't make sense or wouldn't be fun, suggest improvements!</code>
+    </div>
+
+    <div class="tip">
+      <strong>This is the most important phase.</strong> Inventing a game from scratch and then building it is exactly what real game developers do. Don't worry if your first idea isn't perfect — even professional game designers go through 10+ iterations. Ask Claude to help you brainstorm and refine your concept!
+    </div>
+
+    <ul class="checklist">
+      <li>Brainstorm game ideas with your brother (at least 3 ideas)</li>
+      <li>Pick the best one and describe it to Claude</li>
+      <li>Build the game</li>
+      <li>Playtest and iterate — change what doesn't feel fun</li>
+      <li>Link it from the arcade menu</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 Milestone: Game Inventor</h4>
+      <p>You've invented and built your own original game. This is the real deal!</p>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase" data-step="5">
+    <h3>Polish, Publish & Share</h3>
+    <div class="time">⏱ About 1–2 hours</div>
+
+    <p>Time to make your arcade feel like a real app and get it into your friends' hands!</p>
+
+    <div class="claude-prompt">
+      <code>My mobile arcade app is ready to share! Can you help me:
+
+1. Make sure the PWA works perfectly — proper manifest, icons, service worker for offline play
+2. Add a global high scores page that shows best scores across all 3 games
+3. Add smooth page transitions between the menu and each game
+4. Create an app icon (as an SVG or Canvas-generated image)
+5. Add a "Share with friends" button that copies the link or opens the share menu on mobile
+
+Then walk me step-by-step through publishing it on GitHub Pages (or another free host) so my friends can install it on their phones.</code>
+    </div>
+
+    <div class="tip">
+      To help your arcade go "viral" at school, add a <strong>"Challenge a Friend"</strong> button after each game that lets you share your score along with a link to the game. Something like: "I scored 2,450 on Neon Snake! Can you beat me? 🐍 [link]"
+    </div>
+
+    <ul class="checklist">
+      <li>Add smooth transitions and polish the UI</li>
+      <li>Add a global high scores page</li>
+      <li>Make sure the PWA installs properly on iOS and Android</li>
+      <li>Publish online</li>
+      <li>Create a challenge/share feature</li>
+      <li>Send to 5 friends and watch them install it!</li>
+      <li>Collect feedback — what game do they like best?</li>
+    </ul>
+
+    <div class="milestone">
+      <h4>🏆 FINAL MILESTONE: App Developer!</h4>
+      <p>You've built a real mobile app with 3 games that anyone can install on their phone. You are app developers!</p>
+    </div>
+  </div>
+
+  <!-- BONUS -->
+  <div class="share-section">
+    <h3>🎯 BONUS CHALLENGES</h3>
+    <p style="margin-bottom: 15px; color: #ccc;">Want to take it further?</p>
+    <ul class="checklist" style="text-align: left; max-width: 500px; margin: 0 auto;">
+      <li>Add a 4th and 5th game to your arcade</li>
+      <li>Add achievements/badges ("Play 100 games", "Score over 5000")</li>
+      <li>Create a leaderboard where friends can compare scores online</li>
+      <li>Add background music and sound effects to every game</li>
+      <li>Learn React Native or Flutter to build actual app store apps (ask Claude to teach you!)</li>
+    </ul>
+  </div>
+
+  <div class="intro-box" style="border-color: rgba(123,47,247,0.3);">
+    <h2 style="color: var(--purple);">🧠 What You'll Learn Along The Way</h2>
+    <p><strong>Canvas API</strong> — How to draw graphics with code. Every shape, animation, and particle effect is drawn pixel by pixel. This is the foundation of 2D game development.</p>
+    <p style="margin-top: 10px;"><strong>Touch Events & Mobile Development</strong> — How phones detect taps, swipes, and drags. You'll learn to make interfaces that feel native and responsive on any device.</p>
+    <p style="margin-top: 10px;"><strong>Progressive Web Apps</strong> — How to turn a website into an installable app. This is a real professional skill — many companies use PWAs to reach mobile users without going through app stores.</p>
+    <p style="margin-top: 10px;"><strong>Game Design Thinking</strong> — By inventing your own game, you'll learn what makes games fun: challenge curves, risk vs reward, feedback loops, and the "just one more try" feeling.</p>
+    <p style="margin-top: 10px;"><strong>Product Thinking</strong> — By sharing your app and collecting feedback, you'll learn how real developers think about users. What do people actually enjoy? What's confusing? This is how every app you use gets better over time.</p>
+  </div>
+
+  <div class="intro-box" style="border-color: rgba(254,228,64,0.3); margin-top: 30px;">
+    <h2 style="color: var(--yellow);">🎓 The Journey So Far</h2>
+    <p><strong>Project 1 (Battle Cards)</strong> — You learned HTML, CSS, and JavaScript. You built your first game and published it online.</p>
+    <p style="margin-top: 10px;"><strong>Project 2 (Roblox Arena)</strong> — You learned Lua, 3D game design, and multiplayer game development on a platform with millions of players.</p>
+    <p style="margin-top: 10px;"><strong>Project 3 (Mobile Arcade)</strong> — You learned mobile development, Canvas graphics, game design, and how to build a real app that installs on any phone.</p>
+    <p style="margin-top: 15px; color: var(--yellow); font-weight: 700;">You've gone from zero to building real games on three different platforms. You can code. You can design. You can ship. Whatever you want to build next — you've got the tools and you've got Claude. Go build something amazing! 🚀</p>
+  </div>
+
+</div>
+
+<footer>
+  Project 3 of 3 — Ed & John's Game Dev Journey — Built with ❤️ by Dad & Claude
+</footer>
+
+<script>
+  document.querySelectorAll('.checklist li').forEach(li => {
+    li.addEventListener('click', () => li.classList.toggle('done'));
+  });
+</script>
+
+</body>
+</html>
