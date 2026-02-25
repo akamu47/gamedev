@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fun Zone — Ed & John's Game Dev Journey</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --joke-orange: #ff9f1c;
+    --fact-blue: #2ec4b6;
+    --dark: #0a0a14;
+    --card: #12121f;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--dark);
+    color: #e0e0e0;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,20,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .top-nav a {
+    color: #888;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .top-nav a:hover { color: #fff; }
+  .top-nav .back-link { display: flex; align-items: center; gap: 6px; }
+  .top-nav .project-links { display: flex; gap: 12px; }
+  .top-nav .project-links a.active { color: var(--joke-orange); }
+
+  .hero {
+    background: linear-gradient(135deg, #0a0a14 0%, #1a1028 40%, #0f1a2e 100%);
+    padding: 50px 20px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 3px solid var(--joke-orange);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 50%, rgba(255,159,28,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 70% 50%, rgba(46,196,182,0.08) 0%, transparent 50%);
+  }
+
+  .hero h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    position: relative;
+    background: linear-gradient(90deg, var(--joke-orange), var(--fact-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+
+  .hero .subtitle {
+    font-size: 1rem;
+    color: #888;
+    position: relative;
+  }
+
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  .button-row {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+  }
+
+  .fun-btn {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    padding: 18px 28px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    color: white;
+    min-width: 200px;
+    line-height: 1.6;
+  }
+
+  .fun-btn:hover {
+    transform: translateY(-3px);
+  }
+
+  .fun-btn:active {
+    transform: translateY(0);
+  }
+
+  .fun-btn.joke {
+    background: linear-gradient(135deg, #ff9f1c, #ff6b35);
+    box-shadow: 0 6px 25px rgba(255,159,28,0.3);
+  }
+
+  .fun-btn.joke:hover {
+    box-shadow: 0 10px 35px rgba(255,159,28,0.4);
+  }
+
+  .fun-btn.fact {
+    background: linear-gradient(135deg, #2ec4b6, #1a9e8f);
+    box-shadow: 0 6px 25px rgba(46,196,182,0.3);
+  }
+
+  .fun-btn.fact:hover {
+    box-shadow: 0 10px 35px rgba(46,196,182,0.4);
+  }
+
+  /* Result card */
+  .result-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 0;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+    border: 2px solid rgba(255,255,255,0.05);
+  }
+
+  .result-card.joke-active {
+    border-color: rgba(255,159,28,0.4);
+  }
+
+  .result-card.fact-active {
+    border-color: rgba(46,196,182,0.4);
+  }
+
+  .result-inner {
+    padding: 40px 30px;
+  }
+
+  .result-card .emoji {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  .result-card .label {
+    font-size: 0.65rem;
+    font-family: 'Press Start 2P', cursive;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  .result-card .label.joke-label { color: var(--joke-orange); }
+  .result-card .label.fact-label { color: var(--fact-blue); }
+
+  .result-card .text {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #ddd;
+    max-width: 500px;
+  }
+
+  .result-card .punchline {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--joke-orange);
+    margin-top: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .result-card .punchline.show {
+    opacity: 1;
+  }
+
+  .reveal-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 10px 24px;
+    border: 2px solid var(--joke-orange);
+    background: transparent;
+    color: var(--joke-orange);
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .reveal-btn:hover {
+    background: var(--joke-orange);
+    color: var(--dark);
+  }
+
+  .placeholder {
+    color: #444;
+    font-size: 0.9rem;
+  }
+
+  .placeholder .emoji {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+  }
+
+  /* Counter */
+  .counter {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.75rem;
+    color: #444;
+  }
+
+  .counter span { font-weight: 700; }
+  .counter .joke-count { color: rgba(255,159,28,0.6); }
+  .counter .fact-count { color: rgba(46,196,182,0.6); }
+
+  /* Category filter */
+  .category-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+  }
+
+  .cat-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+    color: #888;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cat-btn:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+  .cat-btn.active { color: #fff; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); }
+
+  /* Animation */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-in {
+    animation: fadeInUp 0.4s ease forwards;
+  }
+
+  /* Share button */
+  .share-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent;
+    color: #666;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.2s;
+  }
+
+  .share-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+
+  .copied-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #222;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+
+  .copied-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px;
+    color: #333;
+    font-size: 0.8rem;
+    border-top: 1px solid #1a1a1a;
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="back-link">← Home</a>
+  <div class="project-links">
+    <a href="project-1-battle-cards.html">1</a>
+    <a href="project-2-roblox-adventure.html">2</a>
+    <a href="project-3-mobile-arcade.html">3</a>
+    <a href="project-4-geometry-dash.html">4</a>
+    <a href="fun-zone.html" class="active">Fun</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>🎲 FUN ZONE</h1>
+  <div class="subtitle">Take a break. Learn something wild. Laugh at something terrible.</div>
+</div>
+
+<div class="container">
+
+  <div class="category-row">
+    <button class="cat-btn active" data-cat="all">All</button>
+    <button class="cat-btn" data-cat="gaming">Gaming</button>
+    <button class="cat-btn" data-cat="coding">Coding</button>
+    <button class="cat-btn" data-cat="science">Science</button>
+    <button class="cat-btn" data-cat="random">Random</button>
+  </div>
+
+  <div class="button-row">
+    <button class="fun-btn joke" onclick="showJoke()">😂 Tell Me<br>A Joke</button>
+    <button class="fun-btn fact" onclick="showFact()">🧠 Tell Me<br>A Cool Fact</button>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="result-inner" id="resultInner">
+      <div class="placeholder">
+        <span class="emoji">👆</span>
+        <p>Hit a button to get started!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="counter">
+    Jokes told: <span class="joke-count" id="jokeCount">0</span> &nbsp;·&nbsp;
+    Facts learned: <span class="fact-count" id="factCount">0</span>
+  </div>
+
+</div>
+
+<div class="copied-toast" id="toast">Copied to clipboard!</div>
+
+<footer>
+  Ed & John's Game Dev Journey — Fun Zone
+</footer>
+
+<script>
+const jokes = [
+  // GAMING
+  { cat: "gaming", setup: "Why did the gamer cross the road?", punchline: "To get to the other side quest." },
+  { cat: "gaming", setup: "What's a creeper's favourite subject at school?", punchline: "Hisss-tory." },
+  { cat: "gaming", setup: "Why don't Fortnite players ever get cold?", punchline: "Because they're always near the storm." },
+  { cat: "gaming", setup: "What did the noob say after losing 50 games in a row?", punchline: "\"I'm not bad, my controller is just wireless.\"" },
+  { cat: "gaming", setup: "Why did Mario go to the therapist?", punchline: "He kept hitting rock bottom." },
+  { cat: "gaming", setup: "Why do Roblox developers make terrible comedians?", punchline: "Their jokes keep getting moderated." },
+  { cat: "gaming", setup: "What's a skeleton's favourite instrument in Minecraft?", punchline: "The trom-bone." },
+  { cat: "gaming", setup: "Why was the Clash Royale player a good banker?", punchline: "He always managed his elixir wisely." },
+  { cat: "gaming", setup: "What does a gamer eat for breakfast?", punchline: "Wii-tabix." },
+  { cat: "gaming", setup: "Why did the Geometry Dash player break up with their partner?", punchline: "They kept hitting too many obstacles in the relationship." },
+  { cat: "gaming", setup: "Why don't zombies ever win at Fortnite?", punchline: "They keep dropping in the wrong place." },
+  { cat: "gaming", setup: "What do you call a fish who plays video games?", punchline: "A bass-ic gamer." },
+  { cat: "gaming", setup: "Why are ghosts terrible at lying in Among Us?", punchline: "Because you can see right through them." },
+
+  // CODING
+  { cat: "coding", setup: "Why do programmers prefer dark mode?", punchline: "Because light attracts bugs." },
+  { cat: "coding", setup: "What's a programmer's favourite place to hang out?", punchline: "Foo bar." },
+  { cat: "coding", setup: "Why was the JavaScript developer sad?", punchline: "Because he didn't Node how to Express himself." },
+  { cat: "coding", setup: "What do you call 8 hobbits?", punchline: "A hobbyte." },
+  { cat: "coding", setup: "Why do Python programmers have low self-esteem?", punchline: "They're constantly comparing themselves to others." },
+  { cat: "coding", setup: "How do you comfort a JavaScript bug?", punchline: "You console it." },
+  { cat: "coding", setup: "Why did the developer go broke?", punchline: "Because he used up all his cache." },
+  { cat: "coding", setup: "What's a computer's least favourite food?", punchline: "Spam." },
+  { cat: "coding", setup: "Why did the programmer quit his job?", punchline: "Because he didn't get arrays. (a raise)" },
+  { cat: "coding", setup: "What's the object-oriented way to become wealthy?", punchline: "Inheritance." },
+  { cat: "coding", setup: "Why do programmers always mix up Halloween and Christmas?", punchline: "Because Oct 31 = Dec 25." },
+  { cat: "coding", setup: "What did the HTML say to the CSS?", punchline: "\"You make me look good.\"" },
+
+  // SCIENCE
+  { cat: "science", setup: "Why can't you trust atoms?", punchline: "They make up everything." },
+  { cat: "science", setup: "What did the biologist wear on a first date?", punchline: "Designer genes." },
+  { cat: "science", setup: "Why did the photon check no luggage at the airport?", punchline: "Because it was travelling light." },
+  { cat: "science", setup: "What do you do with a sick chemist?", punchline: "If you can't helium, and you can't curium, then you might as well barium." },
+  { cat: "science", setup: "How does the moon cut his hair?", punchline: "Eclipse it." },
+  { cat: "science", setup: "Why did the sun go to school?", punchline: "To get a little brighter." },
+
+  // RANDOM
+  { cat: "random", setup: "What do you call a fake noodle?", punchline: "An impasta." },
+  { cat: "random", setup: "Why don't eggs tell jokes?", punchline: "They'd crack each other up." },
+  { cat: "random", setup: "What do you call a sleeping dinosaur?", punchline: "A dino-snore." },
+  { cat: "random", setup: "Why did the scarecrow win an award?", punchline: "He was outstanding in his field." },
+  { cat: "random", setup: "What do you call a bear with no teeth?", punchline: "A gummy bear." },
+  { cat: "random", setup: "Why can't a bicycle stand on its own?", punchline: "Because it's two-tired." }
+];
+
+const facts = [
+  // GAMING
+  { cat: "gaming", text: "The first video game ever made was 'Tennis for Two' in 1958 — it was played on an oscilloscope, basically a fancy science screen." },
+  { cat: "gaming", text: "Minecraft has sold over 300 million copies, making it the best-selling video game of all time." },
+  { cat: "gaming", text: "The Roblox platform has over 70 million daily active users — that's more than the entire population of the UK." },
+  { cat: "gaming", text: "Pac-Man was originally called 'Puck-Man' in Japan. They changed it for Western audiences because they were worried people would scratch the P to make it rude." },
+  { cat: "gaming", text: "The famous Konami Code (Up Up Down Down Left Right Left Right B A) has appeared in over 100 different games since 1986." },
+  { cat: "gaming", text: "Fortnite made over $9 billion in its first two years — more than most countries' GDP." },
+  { cat: "gaming", text: "The world record for completing Geometry Dash's Bloodbath took over 130,000 attempts by the first person to beat it." },
+  { cat: "gaming", text: "Nintendo started as a playing card company in 1889 — that's over 130 years ago, way before video games existed." },
+  { cat: "gaming", text: "The voice of Mario (Charles Martinet) has said 'It's-a me, Mario!' over 100 million times across all Mario games." },
+  { cat: "gaming", text: "Clash Royale was built by a team of just 15 people at Supercell. Small teams can make massive games!" },
+  { cat: "gaming", text: "The original Legend of Zelda fit in just 128 kilobytes — that's about 5,000 times smaller than a single photo on your phone." },
+
+  // CODING
+  { cat: "coding", text: "The first computer programmer was Ada Lovelace, who wrote the first algorithm in the 1840s — nearly 100 years before computers existed." },
+  { cat: "coding", text: "There are over 700 programming languages in the world. JavaScript (which you're learning!) is used by 98% of all websites." },
+  { cat: "coding", text: "The first computer bug was an actual real bug — a moth stuck in a relay of the Harvard Mark II computer in 1947." },
+  { cat: "coding", text: "Python is named after Monty Python, not the snake. The creator Guido van Rossum was a fan of the comedy group." },
+  { cat: "coding", text: "The average video game has between 100,000 and 1 million lines of code. GTA V had over 100 million!" },
+  { cat: "coding", text: "Lua (the language used in Roblox) means 'moon' in Portuguese. It was created in Brazil in 1993." },
+  { cat: "coding", text: "HTML was invented by Tim Berners-Lee in 1991. He also invented the World Wide Web — one person basically created the internet as we know it." },
+  { cat: "coding", text: "The longest known bug in computing history was in the Unix operating system — it went unnoticed for 25 years." },
+  { cat: "coding", text: "The first website ever created is still online: info.cern.ch. It looks incredibly basic by today's standards." },
+  { cat: "coding", text: "AI models like Claude are trained on text from billions of web pages — but they can't actually browse the internet or remember previous conversations on their own." },
+
+  // SCIENCE
+  { cat: "science", text: "A day on Venus is longer than a year on Venus. It takes 243 Earth days to rotate once but only 225 days to orbit the Sun." },
+  { cat: "science", text: "Your body contains about 37.2 trillion cells — that's more than 4,000 times the number of people on Earth." },
+  { cat: "science", text: "Light from the Sun takes about 8 minutes and 20 seconds to reach Earth. You're literally seeing the Sun as it was 8 minutes ago." },
+  { cat: "science", text: "Octopuses have three hearts, blue blood, and nine brains — one central brain and one in each of their eight arms." },
+  { cat: "science", text: "A teaspoon of neutron star material would weigh about 6 billion tonnes — roughly the weight of every car on Earth combined." },
+  { cat: "science", text: "Honey never spoils. Archaeologists have found 3,000-year-old honey in Egyptian tombs that was still perfectly edible." },
+  { cat: "science", text: "There are more possible chess games than atoms in the observable universe. The number is roughly 10^120." },
+  { cat: "science", text: "Bananas are slightly radioactive due to their potassium content. You'd need to eat about 10 million bananas at once for it to be dangerous though." },
+  { cat: "science", text: "The human brain uses about 20% of your body's total energy — even though it's only about 2% of your body weight." },
+  { cat: "science", text: "Water can boil and freeze at the same time. It's called the 'triple point' and happens at a very specific temperature and pressure." },
+
+  // RANDOM
+  { cat: "random", text: "The inventor of the Pringles can (Fredric Baur) was so proud of his creation that his ashes were buried in one after he died." },
+  { cat: "random", text: "A group of flamingos is called a 'flamboyance'." },
+  { cat: "random", text: "The shortest war in history was between Britain and Zanzibar in 1896 — it lasted just 38 minutes." },
+  { cat: "random", text: "The average person walks about 100,000 miles in a lifetime — that's the equivalent of walking around the Earth 4 times." },
+  { cat: "random", text: "Cows have best friends and get stressed when they're separated from them." },
+  { cat: "random", text: "The dot over the letters 'i' and 'j' is called a 'tittle'." }
+];
+
+let currentCat = 'all';
+let jokeCounter = 0;
+let factCounter = 0;
+let lastJokeIndex = -1;
+let lastFactIndex = -1;
+
+// Category filter
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCat = btn.dataset.cat;
+  });
+});
+
+function getFiltered(arr) {
+  if (currentCat === 'all') return arr;
+  return arr.filter(item => item.cat === currentCat);
+}
+
+function getRandom(arr, lastIndex) {
+  const filtered = getFiltered(arr);
+  if (filtered.length === 0) return { item: null, index: -1 };
+  if (filtered.length === 1) return { item: filtered[0], index: 0 };
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * filtered.length);
+  } while (idx === lastIndex && filtered.length > 1);
+  return { item: filtered[idx], index: idx };
+}
+
+function showJoke() {
+  const { item: joke, index } = getRandom(jokes, lastJokeIndex);
+  if (!joke) {
+    showEmpty('jokes');
+    return;
+  }
+  lastJokeIndex = index;
+  jokeCounter++;
+  document.getElementById('jokeCount').textContent = jokeCounter;
+
+  const card = document.getElementById('resultCard');
+  const inner = document.getElementById('resultInner');
+  card.className = 'result-card joke-active';
+
+  inner.innerHTML = `
+    <div class="animate-in">
+      <span class="emoji">😂</span>
+      <span class="label joke-label">Joke</span>
+      <div class="text">${joke.setup}</div>
+      <div class="punchline" id="punchline">${joke.punchline}</div>
+      <button class="reveal-btn" id="revealBtn" onclick="revealPunchline()">Show punchline</button>
+      <button class="share-btn" onclick="shareContent('${joke.setup.replace(/'/g, "\\'")} ${joke.punchline.replace(/'/g, "\\'")}')" style="display:none" id="shareBtn">📋 Copy to share</button>
+    </div>
+  `;
+}
+
+function revealPunchline() {
+  document.getElementById('punchline').classList.add('show');
+  document.getElementById('revealBtn').style.display = 'none';
+  const shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) shareBtn.style.display = 'inline-block';
+}
+
+function showFact() {
+  const { item: fact, index } = getRandom(facts, lastFactIndex);
+  if (!fact) {
+    showEmpty('facts');
+    return;
+  }
+  lastFactIndex = index;
+  factCounter++;
+  document.getElementById('factCount').textContent = factCounter;
+
+  const card = document.getElementById('resultCard');
+  const inner = document.getElementById('resultInner');
+  card.className = 'result-card fact-active';
+
+  inner.innerHTML = `
+    <div class="animate-in">
+      <span class="emoji">🧠</span>
+      <span class="label fact-label">Cool Fact</span>
+      <div class="text">${fact.text}</div>
+      <button class="share-btn" onclick="shareContent('${fact.text.replace(/'/g, "\\'")}')">📋 Copy to share</button>
+    </div>
+  `;
+}
+
+function showEmpty(type) {
+  const inner = document.getElementById('resultInner');
+  inner.innerHTML = `
+    <div class="animate-in">
+      <span class="emoji">🤷</span>
+      <div class="text">No ${type} in that category yet! Try "All" or a different category.</div>
+    </div>
+  `;
+}
+
+function shareContent(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+</script>
+
+</body>
+</html>
